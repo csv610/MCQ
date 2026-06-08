@@ -16,42 +16,31 @@ from dataclasses import dataclass
 import litellm
 from tqdm import tqdm
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
-from prompt_builder import PromptBuilder
+from .prompt_builder import PromptBuilder
 
 
-# Constants
-LOG_FILE = "mcq_generate.log"
-LOG_FORMAT = "%(asctime)s - %(levelname)s - %(message)s"
-
-
-def setup_logger():
-    """Setup logging configuration."""
-    logger = logging.getLogger(__name__)
+def setup_logger(name: str = __name__) -> logging.Logger:
+    """Setup logging configuration (console + file)."""
+    logger = logging.getLogger(name)
     if logger.handlers:
         return logger
 
+    fmt = "%(asctime)s - %(levelname)s - %(message)s"
     try:
-        handler = logging.FileHandler(LOG_FILE)
-        handler.setFormatter(logging.Formatter(LOG_FORMAT))
+        handler = logging.FileHandler("mcq_generate.log")
+        handler.setFormatter(logging.Formatter(fmt))
         logger.addHandler(handler)
     except IOError as e:
         print(f"Warning: Could not create log file: {e}")
 
     console_handler = logging.StreamHandler()
-    console_handler.setFormatter(logging.Formatter(LOG_FORMAT))
+    console_handler.setFormatter(logging.Formatter(fmt))
     logger.addHandler(console_handler)
     logger.setLevel(logging.INFO)
     return logger
 
 
-logger = setup_logger()
-
-# Configure logging for this module
-if not logger.handlers:
-    handler = logging.FileHandler(LOG_FILE)
-    handler.setFormatter(logging.Formatter(LOG_FORMAT))
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 @dataclass

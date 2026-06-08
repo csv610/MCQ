@@ -7,7 +7,7 @@ Creates multiple-choice questions using AI with customizable options and difficu
 import argparse
 import sys
 import json
-from mcq_generator import MCQGenerator, QuestionConfig, setup_logger
+from mcq_generator.mcq_generator import MCQGenerator, QuestionConfig, setup_logger
 
 logger = setup_logger()
 

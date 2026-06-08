@@ -13,7 +13,10 @@ from datetime import datetime
 import sys
 import io
 
-from binary_question_cli import (
+sys.path.insert(0, str(Path(__file__).parent.parent))  # for scripts package
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))  # for mcq_generator package
+
+from scripts.binary_question_cli import (
     _format_model_id,
     setup_model,
     _validate_cli_args,

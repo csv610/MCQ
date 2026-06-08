@@ -8,9 +8,10 @@ sys.path.insert(0, str(Path(__file__).parent.parent.parent / "src"))
 
 from mcq_generator.mcq_generator import QuestionGenerator
 from mcq_generator.question_translator import QuestionTranslator
-from mcq_generator.question_prerequsite import QuestionPrerequisite
+from mcq_generator.question_prerequisite import QuestionPrerequisite
 from mcq_generator.similar_question_generator import SimilarQuestionGenerator
 from mcq_generator.prompt_builder import PromptBuilder
+import litellm
 import logging
 
 # Initialize logging
@@ -148,7 +149,8 @@ def main():
                             prompt_builder = PromptBuilder()
                             prompt = prompt_builder.get_explain_answer_prompt(q["question"], q["options"], q["correct_answer"])
 
-                            response = model.get_response(
+                            response = litellm.completion(
+                                model=model,
                                 messages=[
                                     {"role": "system", "content": "You are an expert assistant providing detailed explanations for multiple-choice questions."},
                                     {"role": "user", "content": prompt}
@@ -156,7 +158,7 @@ def main():
                                 max_tokens=max_tokens_explanation,
                                 temperature=0.7,
                             )
-                            explanation = response[0] if response else "Unable to generate explanation."
+                            explanation = response.choices[0].message.content if response else "Unable to generate explanation."
 
                             # Display explanation
                             st.write(explanation)
@@ -168,7 +170,7 @@ def main():
                     with st.spinner(f"Fetching prerequisite material for Question {i}..."):
                         if model:
                             question_prerequisite = QuestionPrerequisite(model)
-                            prerequisite_material = question_prerequisite.fetch_prerequisite(q["question"], q["options"])
+                            prerequisite_material = question_prerequisite.question_prerequisites(q["question"], q["options"])
                             st.write(prerequisite_material)
                         else:
                             st.error("Please select a valid model.")

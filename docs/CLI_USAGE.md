@@ -1,224 +1,141 @@
-# MCQ Generator CLI - Usage Guide
+# MCQ Generator - Usage Guide
 
-A command-line interface for generating multiple-choice questions using AI models (OpenAI, Claude, or any LiteLLM provider).
+Two CLI tools are provided: one for multiple-choice questions and one for binary (True/False, Yes/No) questions.
 
 ## Installation
 
-Make sure you have Python 3.7+ installed. Install dependencies:
-
 ```bash
-pip install -r requirements.txt
-```
-
-Or install individually:
-```bash
-pip install openai python-dotenv litellm requests
+pip install -e .
 ```
 
 ## Setup
 
-### 1. Set API Keys
-
-Create a `.env` file in the project directory with your API keys:
+Set your API key (default provider is Perplexity):
 
 ```bash
-# For OpenAI
-OPENAI_API_KEY=your_openai_api_key_here
-
-# For Claude (if using LiteLLM)
-ANTHROPIC_API_KEY=your_anthropic_api_key_here
+export PERPLEXITY_API_KEY="pplx-..."
 ```
 
-### 2. Initialize the Model
+## MCQ Generation CLI
 
-Before generating questions, you need to initialize the AI model:
+### Basic Usage
 
 ```bash
-python cli.py init-model --provider openai --model gpt-4o-mini
+python scripts/mcq_generate_cli.py \
+  --field "Physics" \
+  --difficulty hard \
+  --count 5 \
+  --options 4 \
+  --correct-answers 1 \
+  --provider perplexity \
+  --model sonar \
+  --save physics.json
 ```
 
-**Provider options:**
-- `openai` - Use OpenAI models
-- `claude` - Use Claude models via LiteLLM
-- `litellm` - Use other LiteLLM providers
+### Options
 
-**Example models:**
-- OpenAI: `gpt-4o-mini`, `gpt-4o`, `gpt-4`
-- Claude: `claude-3-5-sonnet-20241022`, `claude-3-5-haiku-20241022`
+| Flag | Required | Description | Default |
+|------|----------|-------------|---------|
+| `--field, -f` | Yes | Subject field | - |
+| `--subfield, -sf` | No | Sub-category within field | None |
+| `--difficulty, -d` | No | easy, medium, hard | medium |
+| `--count, -c` | No | Number of questions | 5 |
+| `--options, -o` | Yes | Options per question (> 1) | - |
+| `--correct-answers` | No | Correct answers per question | 1 |
+| `--max-tokens` | No | Max tokens for LLM | 3000 |
+| `--provider` | No | openai, claude, perplexity, litellm | perplexity |
+| `--model` | No | Model name | sonar |
+| `--save` | No | Output JSON file | auto-generated |
 
-## Commands
-
-### 1. Generate Questions
-
-Generate MCQ questions on any topic:
+### Examples
 
 ```bash
-python cli.py generate --specialization "Python Programming" --count 5
+# Minimum required
+python scripts/mcq_generate_cli.py --field "History" --options 4
+
+# Custom difficulty and count
+python scripts/mcq_generate_cli.py -f "Biology" -d easy -c 10 -o 4 --save biology.json
+
+# Multiple correct answers ("Select all that apply")
+python scripts/mcq_generate_cli.py -f "Math" -o 5 --correct-answers 2
+
+# "None of the Above" questions
+python scripts/mcq_generate_cli.py -f "Chemistry" -o 4 --correct-answers 0
 ```
 
-**Options:**
-- `--specialization, -s` (required) - Topic/subject
-- `--difficulty, -d` - Level: `easy`, `medium`, `hard` (default: medium)
-- `--count, -c` - Number of questions (default: 5)
-- `--max-tokens` - Maximum tokens for generation (default: 3000)
-- `--save` - Save to file (provide filename)
-- `--show-answers` - Display correct answers
+## Binary Question Generation CLI
 
-**Examples:**
-```bash
-# Generate 3 hard questions on Biology
-python cli.py generate --specialization "Biology" --difficulty hard --count 3
-
-# Generate 5 questions and save to file
-python cli.py generate -s "History" -c 5 --save history_questions.json
-
-# Generate questions and show answers
-python cli.py generate --specialization "Math" --show-answers --save math.json
-```
-
-### 2. Load Questions
-
-Load and display previously saved questions:
+### Basic Usage
 
 ```bash
-python cli.py load questions.json
+python scripts/binary_question_cli.py \
+  --field "Biology" \
+  --difficulty easy \
+  --count 5 \
+  --question-type true_false \
+  --save biology_tf.json
 ```
 
-**Options:**
-- `filename` (required) - Path to JSON file
-- `--show-answers` - Display correct answers
+### Options
 
-**Example:**
-```bash
-python cli.py load my_questions.json --show-answers
-```
+| Flag | Required | Description | Default |
+|------|----------|-------------|---------|
+| `--field, -f` | Yes | Subject field | - |
+| `--subfield, -sf` | No | Sub-category within field | None |
+| `--difficulty, -d` | No | easy, medium, hard | medium |
+| `--count, -c` | No | Number of questions | 5 |
+| `--question-type, -qt` | No | true_false, yes_no | true_false |
+| `--max-tokens` | No | Max tokens for LLM | 2000 |
+| `--provider` | No | openai, claude, perplexity, litellm | perplexity |
+| `--model` | No | Model name | sonar |
+| `--save` | No | Output JSON file | auto-generated |
+| `--display` | No | Show questions after generation | True |
 
-### 3. Explain a Question
-
-Get a detailed explanation for a specific question:
-
-```bash
-python cli.py explain questions.json --question-num 1 --max-tokens 1500
-```
-
-**Options:**
-- `filename` (required) - Path to JSON file
-- `--question-num, -q` (required) - Question number (1-based index)
-- `--max-tokens` - Maximum tokens for explanation (default: 1500)
-
-**Example:**
-```bash
-python cli.py explain history.json -q 2
-```
-
-### 4. Translate Questions
-
-Translate questions to another language:
+### Examples
 
 ```bash
-python cli.py translate questions.json --language hindi --save
+# True/False questions
+python scripts/binary_question_cli.py -f "Physics" -qt true_false
+
+# Yes/No questions with custom provider
+python scripts/binary_question_cli.py -f "History" -qt yes_no --provider openai --model gpt-4o-mini
 ```
 
-**Options:**
-- `filename` (required) - Path to JSON file
-- `--language, -l` - Target language: `hindi`, `spanish`, `french` (default: hindi)
-- `--save` - Save translated questions to file
+## JSON Output Format
 
-**Examples:**
-```bash
-# Translate to Hindi
-python cli.py translate questions.json --language hindi
-
-# Translate to Spanish and save
-python cli.py translate questions.json -l spanish --save
-```
-
-### 5. Get Prerequisites
-
-Get prerequisite knowledge for understanding a question:
-
-```bash
-python cli.py prerequisites questions.json --question-num 1
-```
-
-**Options:**
-- `filename` (required) - Path to JSON file
-- `--question-num, -q` (required) - Question number (1-based index)
-
-**Example:**
-```bash
-python cli.py prerequisites physics.json -q 3
-```
-
-### 6. Generate Similar Question
-
-Generate a similar question based on an existing one:
-
-```bash
-python cli.py similar questions.json --question-num 2
-```
-
-**Options:**
-- `filename` (required) - Path to JSON file
-- `--question-num, -q` (required) - Question number to use as reference (1-based index)
-
-**Example:**
-```bash
-python cli.py similar math.json -q 1
-```
-
-### 7. Show Information
-
-Display general information about the CLI:
-
-```bash
-python cli.py info
-```
-
-## Complete Workflow Example
-
-```bash
-# Step 1: Initialize OpenAI model
-python cli.py init-model --provider openai --model gpt-4o-mini
-
-# Step 2: Generate 5 medium difficulty questions on Python
-python cli.py generate --specialization "Python Programming" --count 5 --save python_questions.json
-
-# Step 3: View questions with answers
-python cli.py load python_questions.json --show-answers
-
-# Step 4: Get explanation for question 1
-python cli.py explain python_questions.json -q 1
-
-# Step 5: Get prerequisites for question 3
-python cli.py prerequisites python_questions.json -q 3
-
-# Step 6: Generate similar question to question 2
-python cli.py similar python_questions.json -q 2
-
-# Step 7: Translate to Hindi
-python cli.py translate python_questions.json -l hindi --save
-```
-
-## JSON File Format
-
-Questions are saved in the following format:
+### MCQ Format
 
 ```json
 {
-  "specialization": "Python Programming",
+  "field": "Physics",
+  "subfield": "Mechanics",
   "generated_at": "2024-11-23T10:30:45.123456",
   "question_count": 5,
   "questions": [
     {
-      "question": "What is the output of print(2 ** 3)?",
-      "options": {
-        "A": "6",
-        "B": "8",
-        "C": "9",
-        "D": "5"
-      },
-      "correct_answer": "B"
+      "question": "What is the SI unit of force?",
+      "options": ["Newton", "Joule", "Watt", "Pascal"],
+      "correct_answer": ["A"]
+    }
+  ]
+}
+```
+
+### Binary Question Format
+
+```json
+{
+  "metadata": {
+    "field": "Biology",
+    "question_type": "true_false",
+    "count": 3,
+    "generated_at": "2024-11-23T10:30:45.123456"
+  },
+  "questions": [
+    {
+      "question": "The heart has four chambers.",
+      "correct_answer": "True",
+      "explanation": "The human heart has four chambers: two atria and two ventricles."
     }
   ]
 }
@@ -226,63 +143,19 @@ Questions are saved in the following format:
 
 ## Logging
 
-All CLI operations are logged to `mcq_cli.log`. Check this file for debugging information.
+- MCQ CLI logs to `mcq_generate.log`
+- Binary question CLI logs to `binary_question_cli.log`
 
 ## Troubleshooting
 
-### Model Not Initialized
-```
-Error: Model not initialized. Please set up a model first.
-```
-**Solution:** Run `python cli.py init-model` before other commands.
+### Validation Errors
 
-### File Not Found
 ```
-Error: File 'questions.json' not found.
-```
-**Solution:** Make sure the filename is correct and the file exists.
-
-### API Key Issues
-```
-Error: Failed to initialize model
-```
-**Solution:** Check your `.env` file has the correct API key for your chosen provider.
-
-### Invalid Question Number
-```
-Error: Invalid question number. Valid range: 1-5
-```
-**Solution:** Use a valid question number based on the total questions in your file.
-
-## Getting Help
-
-```bash
-# General help
-python cli.py --help
-
-# Command-specific help
-python cli.py generate --help
-python cli.py explain --help
-python cli.py translate --help
+Invalid input: Field must be a non-empty string
+Invalid input: Number of options (--options) must be greater than 1
+Invalid input: Max tokens must be at least 100
 ```
 
-## Features
+### API Errors
 
-✅ Multiple AI providers (OpenAI, Claude, LiteLLM)
-✅ Customizable difficulty levels (Easy, Medium, Hard)
-✅ Generate 1 to 100+ questions at once
-✅ Save questions to JSON format
-✅ Load and review saved questions
-✅ Get detailed explanations
-✅ Translate to multiple languages
-✅ Get prerequisite knowledge
-✅ Generate similar questions
-✅ Full CLI with help text
-✅ Comprehensive logging
-
-## Notes
-
-- Questions are generated using AI models; ensure you review them for accuracy
-- Keep your API keys secure and never commit them to version control
-- Larger token values allow longer, more detailed questions
-- Each command run is logged for reference
+Check your API key is set and valid for the chosen provider.

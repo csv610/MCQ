@@ -24,13 +24,13 @@ shell:
 	bash -c 'source mcqenv/bin/activate && bash'
 
 install: venv
-	. mcqenv/bin/activate && pip install -r requirements.txt
+	. mcqenv/bin/activate && pip install -e .
 
 test:
 	. mcqenv/bin/activate && python -m unittest discover tests -v
 
 run:
-	. mcqenv/bin/activate && python mcq_generate_cli.py
+	. mcqenv/bin/activate && python scripts/mcq_generate_cli.py --help
 
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
@@ -46,7 +46,7 @@ cleandirs: clean
 	find . -type d -name .eggs -exec rm -rf {} + 2>/dev/null || true
 
 lint:
-	. mcqenv/bin/activate && python -m flake8 --max-line-length=100 mcq_generator.py mcq_generate_cli.py question_generator.py
+	. mcqenv/bin/activate && python -m flake8 --max-line-length=100 src/mcq_generator/ scripts/
 
 format:
-	. mcqenv/bin/activate && python -m black --line-length=100 mcq_generator.py mcq_generate_cli.py question_generator.py
+	. mcqenv/bin/activate && python -m black --line-length=100 src/mcq_generator/ scripts/

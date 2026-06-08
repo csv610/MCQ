@@ -1,5 +1,5 @@
 import litellm
-from prompt_builder import PromptBuilder
+from .prompt_builder import PromptBuilder
 
 class SimilarQuestionGenerator:
     def __init__(self, model):

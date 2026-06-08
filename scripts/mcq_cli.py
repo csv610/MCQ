@@ -12,11 +12,12 @@ from pathlib import Path
 from typing import List, Dict
 from datetime import datetime
 import litellm
-from mcq_generator import QuestionGenerator
-from binary_question_generator import BinaryQuestionGenerator, BinaryQuestionConfig
-from question_translator import QuestionTranslator
-from question_prerequsite import QuestionPrerequisite
-from similar_question_generator import SimilarQuestionGenerator
+from mcq_generator.mcq_generator import QuestionGenerator
+from mcq_generator.binary_question_generator import BinaryQuestionGenerator
+from mcq_generator import BinaryQuestionConfig
+from mcq_generator.question_translator import QuestionTranslator
+from mcq_generator.question_prerequisite import QuestionPrerequisite
+from mcq_generator.similar_question_generator import SimilarQuestionGenerator
 
 # Configure logging
 logging.basicConfig(
@@ -245,7 +246,7 @@ def cmd_explain(args, cli_app):
 
         question = questions[args.question_num - 1]
 
-        from prompt_builder import PromptBuilder
+        from mcq_generator.prompt_builder import PromptBuilder
         prompt_builder = PromptBuilder()
 
         # Handle both dict and list formats for options

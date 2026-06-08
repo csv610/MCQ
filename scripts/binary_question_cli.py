@@ -10,7 +10,7 @@ import json
 import logging
 from datetime import datetime
 from pathlib import Path
-from binary_question_generator import BinaryQuestionGenerator, QuestionConfig
+from mcq_generator.binary_question_generator import BinaryQuestionGenerator, QuestionConfig
 
 logger = logging.getLogger(__name__)
 if not logger.handlers:

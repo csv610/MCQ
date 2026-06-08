@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mcq_generator"
+version = "1.0.0"
+description = "Generate multiple-choice questions using AI"
+requires-python = ">=3.10"
+dependencies = [
+    "litellm",
+    "tenacity",
+    "tqdm",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+mcq_generator = ["py.typed"]

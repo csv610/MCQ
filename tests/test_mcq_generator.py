@@ -3,8 +3,14 @@ Unit tests for MCQ Generator modules
 """
 
 import unittest
-from prompt_builder import PromptBuilder
-from mcq_generator import QuestionGenerator
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
+sys.path.insert(0, str(Path(__file__).parent.parent / "scripts"))
+
+from mcq_generator.prompt_builder import PromptBuilder
+from mcq_generator.mcq_generator import QuestionGenerator
 
 
 class TestPromptBuilder(unittest.TestCase):
@@ -211,8 +217,8 @@ class TestMCQGenerationEngine(unittest.TestCase):
     """Test MCQGenerationEngine class"""
 
     def setUp(self):
-        from mcq_generate_cli import MCQGenerationEngine
-        self.engine = MCQGenerationEngine("openai/gpt-4o-mini")
+        from mcq_generator.mcq_generator import MCQGenerator
+        self.engine = MCQGenerator("openai/gpt-4o-mini")
 
     def test_validate_params_valid(self):
         """Test parameter validation with valid inputs"""

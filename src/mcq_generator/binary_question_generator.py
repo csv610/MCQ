@@ -11,14 +11,9 @@ from dataclasses import dataclass
 from tenacity import retry, stop_after_attempt, wait_exponential, retry_if_exception_type
 import litellm
 from tqdm import tqdm
-from prompt_builder import PromptBuilder
+from .prompt_builder import PromptBuilder
 
 logger = logging.getLogger(__name__)
-if not logger.handlers:
-    handler = logging.FileHandler("mcq_generate.log")
-    handler.setFormatter(logging.Formatter("%(asctime)s - %(levelname)s - %(message)s"))
-    logger.addHandler(handler)
-    logger.setLevel(logging.INFO)
 
 
 @dataclass
